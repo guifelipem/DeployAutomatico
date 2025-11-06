@@ -1,0 +1,30 @@
+name: Cria Release Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão da Release (ex: v1.0.0)"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Criar arquivo ZIP do repositório
+        run: |
+          zip -r release.zip . -x ".git/*"
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          files: release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
